@@ -73,7 +73,8 @@
 
                     // 댓글 목록 추가
                     for (let review of response.content) {
-                        reviewUl.append(reviewToHtml(review));
+                        let reviewItem = $(reviewToHtml(review));
+                        reviewUl.append(reviewItem);
                     }
 
                 },
@@ -84,7 +85,13 @@
         }
 
         $('.btn-comment').click(function () {
-            let commentText = $('#commentText').val();
+            let commentText = $('#commentText').val().trim();
+            if (!commentText) {
+                alert('댓글을 입력해주세요.');
+                return;
+            }
+            // HTML 태그를 이스케이프
+            commentText = encodeURIComponent(commentText);
             let sendData = {
                 comments: commentText
             };
@@ -101,7 +108,7 @@
                     loadReviewList(chapterId, 0);
                 },
                 error: function () {
-                    alert('리뷰 작성에 실패했습니다.');
+                    alert('댓글 작성에 실패했습니다.');
                 }
             })
         });
@@ -129,20 +136,22 @@
             if (review.memberId === loggedId) {
                 deleteButton = '<button class="delete-review mt-2" data-id="'+review.id+'"><i class="bi bi-x-lg"></i></button>';
             }
-            return `
-                <li class="review-item border-bottom border-opacity-25 mt-2 mb-2">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex flex-column">
-                            <span class="mt-2 me-2" style="font-weight: bold">${review.nickname}</span>
-                            <span class="mt-1">${review.comments}</span>
-                            <span class="mb-3" style="font-weight: lighter; color: #4d5154; font-size: small">${review.createdAt}</span>
-                        </div>
-                        <div>
-                            ${deleteButton}
-                        </div>
+            let li = document.createElement('li');
+            li.className = "review-item border-bottom border-opacity-25 mt-2 mb-2";
+            li.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-column">
+                        <span class="mt-2 me-2" style="font-weight: bold">${review.nickname}</span>
+                        <span class="mt-1"></span>
+                        <span class="mb-3" style="font-weight: lighter; color: #4d5154; font-size: small">${review.createdAt}</span>
                     </div>
-                </li>
+                    <div>
+                        ${deleteButton}
+                    </div>
+                </div>
             `;
+            li.querySelector('.mt-1').innerText = decodeURIComponent(review.comments);
+            return li.outerHTML;
         }
 
         $(document).on('click', '.delete-review', function() {
@@ -244,8 +253,8 @@
         });
 
         $(document).click(function(event) {
-            // 클릭한 요소가 네비게이션바나 챕터 내용이 아닐 경우
-            if (!$(event.target).closest('#navbar').length) {
+            // 클릭한 요소가 네비게이션바, 아닐 경우
+            if (!$(event.target).closest('#navbar, .btn-comment, #commentText, .btn-sort').length) {
                 if (navbarVisible) {
                     // 네비게이션바 숨기기
                     $('#chapterNavbar').hide();

@@ -7,6 +7,7 @@
         <div class="button-group mt-2 mb-2 pt-2 pb-3">
             <!-- 내 작품 버튼 -->
             <a href="/member/myBookList"
+               id="myBookList"
                class="btn btn-outline-dark me-2"
                style="border-radius: 20px">
                 내 작품
@@ -136,10 +137,34 @@
                 $btnMore.show();
                 currentTag = tag;
 
+                updateButtonStyles();
+
                 // 첫 페이지 불러오기
                 let url = tags[currentTag].url(memberId, loadPage);
                 loadBooks(url, memberId, loadPage);
             });
+        }
+
+        // 버튼 스타일 업데이트하는 함수
+        function updateButtonStyles() {
+            // 각 버튼에 대한 jQuery 객체를 변수에 저장
+            let $myBookList = $("#myBookList");
+            let $mySubscribe = $("#mySubscribe");
+            let $myRecent = $("#myRecent");
+
+            // 모든 버튼의 스타일을 초기화
+            $myBookList.removeClass("btn-dark").addClass("btn-outline-dark");
+            $mySubscribe.removeClass("btn-dark").addClass("btn-outline-dark");
+            $myRecent.removeClass("btn-dark").addClass("btn-outline-dark");
+
+            // 현재 선택된 태그에 따라 해당 버튼의 스타일을 변경
+            if (currentTag === 'myBookList') {
+                $myBookList.removeClass("btn-outline-dark").addClass("btn-dark");
+            } else if (currentTag === 'mySubscribe') {
+                $mySubscribe.removeClass("btn-outline-dark").addClass("btn-dark");
+            } else if (currentTag === 'myRecent') {
+                $myRecent.removeClass("btn-outline-dark").addClass("btn-dark");
+            }
         }
 
         // 책 정보를 HTML로 변환하는 함수
@@ -190,6 +215,8 @@
                 </li>
             `;
         }
+
+        updateButtonStyles()
     </script>
 </div>
 </html>
