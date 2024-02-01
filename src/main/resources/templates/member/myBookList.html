@@ -13,10 +13,10 @@
             </a>
 
             <!-- 관심작품 버튼 -->
-            <a href="/member/myInterest"
+            <a id="mySubscribe"
                class="btn btn-outline-dark me-2"
                style="border-radius: 20px">
-                관심작품
+                구독중
             </a>
 
             <!-- 최근 본 버튼 -->
@@ -37,10 +37,10 @@
                                 <!-- 책 이미지 -->
                                 <div class="mx-3">
                                     <img
-                                            style="width: 150px; height: 120px; border-radius: 10px"
-                                            class="border border-opacity-25 rounded"
-                                            th:src="${item.bookImage.startsWith('/images/') ? item.bookImage : '/upload/' + item.bookImage}"
-                                            alt=""
+                                        style="width: 150px; height: 120px; border-radius: 10px"
+                                        class="border border-opacity-25 rounded"
+                                        th:src="${item.bookImage.startsWith('/images/') ? item.bookImage : '/upload/' + item.bookImage}"
+                                        alt=""
                                     >
                                 </div>
                                 <!-- 책 이름과 작가 이름 -->
@@ -80,6 +80,10 @@
             myRecent: {
                 url: (memberId, loadPage) => `/api/book/myRecent?page=${loadPage}&sort=updatedAt,${sort}`,
                 shouldShowContinueReading: () => true
+            },
+            mySubscribe: {
+                url: (memberId, loadPage) => `/api/book/mySubscribe?page=${loadPage}`,
+                shouldShowContinueReading: () => false
             }
         };
 
@@ -145,18 +149,21 @@
 
             if (book.chapterId && tags[currentTag].shouldShowContinueReading()) {
                 continueReadingButton = `
-            <a href="/chapter/read/${book.chapterId}" class="continue-reading-button">
-                이어보기
-                <i class="bi bi-arrow-right" style="font-weight: bold; font-size: larger"></i>
-            </a>
-        `;
+                    <a href="/chapter/read/${book.chapterId}" class="continue-reading-button">
+                        이어보기
+                        <i class="bi bi-arrow-right" style="font-weight: bold; font-size: larger"></i>
+                    </a>
+                `;
             }
+
+            // 책 정보 링크 설정
+            let bookInfoLink = currentTag === 'myBookList' ? `/member/myBookList/${book.id}` : `/book/library/${book.id}`;
 
             return `
                 <!-- 책 항목 -->
                 <li class="pt-2 pb-3 mt-2 mb-2 book-item">
                     <!-- 책 정보 링크 -->
-                    <a href="/member/myBookList/${book.id}" class="subj">
+                    <a href="${bookInfoLink}" class="subj">
                         <div class="d-flex align-items-center">
                             <!-- 책 이미지 -->
                             <div class="mx-3">
