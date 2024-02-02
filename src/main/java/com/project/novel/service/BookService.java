@@ -25,6 +25,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -121,11 +122,15 @@ public class BookService {
         int subscribeCount = subscribeService.subscribeCount(bookId);
         boolean subscribeState = subscribeService.isSubscribed(bookId, loggedId);
 
+        // Redis에서 챕터 리스트를 가져옵니다.
+        List<Object> chapterIdList = chapterService.getChapterList(bookId);
+
         return bookDto.toBuilder()
                 .likeCount(likeCount)
                 .likeState(likeState)
                 .subscribeCount(subscribeCount)
                 .subscribeState(subscribeState)
+                .chapterIdList(chapterIdList)
                 .build();
     }
 
