@@ -182,6 +182,11 @@
             // 책 정보 링크 설정
             let bookInfoLink = currentTag === 'myBookList' ? `/member/myBookList/${book.id}` : `/book/library/${book.id}`;
 
+            // 책 이름을 렌더링하는 요소 생성
+            let bookNameElement = document.createElement('p');
+            bookNameElement.style = "font-weight: bold; color: black; margin-bottom: 5px";
+            bookNameElement.textContent = book.bookName; // HTML 태그 이스케이프
+
             return `
                 <!-- 책 항목 -->
                 <li class="pt-2 pb-3 mt-2 mb-2 book-item">
@@ -199,9 +204,7 @@
                             </div>
                             <!-- 책 이름과 작가 이름 -->
                             <div style="max-width: 100%; vertical-align: middle">
-                                <p style="font-weight: bold; color: black; margin-bottom: 5px">
-                                    ${book.bookName}
-                                </p>
+                                ${bookNameElement.outerHTML}
                                 <p style="color: #4d5154">
                                     ${book.nickname}
                                 </p>
