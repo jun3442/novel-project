@@ -140,7 +140,7 @@ a.btn-sort.active {
 .continue-reading-button {
     text-decoration: none;
     color: black;
-    font-size: 1.2em;
+    font-size: small;
     position: absolute;
     right: 10px;
     top: 50%;
