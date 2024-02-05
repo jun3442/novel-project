@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +22,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -121,11 +119,15 @@ public class BookService {
         int subscribeCount = subscribeService.subscribeCount(bookId);
         boolean subscribeState = subscribeService.isSubscribed(bookId, loggedId);
 
+        // Redis에서 챕터 리스트를 가져옵니다.
+        List<Object> chapterIdList = chapterService.getChapterList(bookId);
+
         return bookDto.toBuilder()
                 .likeCount(likeCount)
                 .likeState(likeState)
                 .subscribeCount(subscribeCount)
                 .subscribeState(subscribeState)
+                .chapterIdList(chapterIdList)
                 .build();
     }
 
@@ -163,9 +165,10 @@ public class BookService {
                 .build();
     }
 
-    public Page<BookListDto> getAllMyBook(Long loggedId, Pageable pageable) {
+    public Slice<BookListDto> getAllMyBook(Long loggedId, Pageable pageable) {
         return bookRepository.findMyBookList(loggedId, pageable);
     }
+
 
     public boolean isMyBook(Long bookId, Long loggedId) {
         Book book = bookRepository.findById(bookId).orElseThrow(
