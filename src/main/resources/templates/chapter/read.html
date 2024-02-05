@@ -77,6 +77,10 @@
                         reviewUl.append(reviewItem);
                     }
 
+                    if(response.last){
+                        $('.btn-more').hide();
+                    }
+
                 },
                 error: function (){
                     alert('리뷰 목록을 불러오는데 실패했습니다.');
@@ -102,10 +106,12 @@
                 data: sendData,
                 success: function (response) {
                     console.log(response);
-                    $('#commentText').val('');
+                    $('#commentText').val(''); // 댓글 입력창 비우기
                     let reviewUl = $('#review');
-                    reviewUl.empty();
-                    loadReviewList(chapterId, 0);
+                    reviewUl.empty(); // 댓글 목록 초기화
+                    loadPage = 0;
+                    loadReviewList(chapterId, 0); // 댓글 목록 다시 불러오기
+                    $('.btn-more').show(); // 더보기 버튼 보이기
                 },
                 error: function () {
                     alert('댓글 작성에 실패했습니다.');
@@ -123,12 +129,8 @@
         });
 
         $(".btn-more").on("click", function () {
-            if(loadPage+1>=totalPages) {
-                $(this).hide();
-            } else {
-                loadPage++;
-                loadReviewList(chapterId, loadPage);
-            }
+            loadPage++;
+            loadReviewList(chapterId, loadPage);
         });
 
         function reviewToHtml(review) {

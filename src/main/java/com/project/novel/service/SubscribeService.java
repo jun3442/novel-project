@@ -9,8 +9,8 @@ import com.project.novel.repository.MemberRepository;
 import com.project.novel.repository.SubscribeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -77,7 +77,7 @@ public class SubscribeService {
         return subscribeRepository.countByBook(book);
     }
 
-    public Page<BookListDto> getMySubscribeList(Long loggedId, Pageable pageable) {
+    public Slice<BookListDto> getMySubscribeList(Long loggedId, Pageable pageable) {
         return subscribeRepository.findMySubscribeList(loggedId, pageable);
     }
 }

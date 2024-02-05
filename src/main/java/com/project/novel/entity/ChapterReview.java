@@ -22,7 +22,7 @@ public class ChapterReview {
     @JoinColumn(name = "chapter_id")
     private Chapter chapter;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
