@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-<div layout:fragment="content" class="main">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="layout/layout :: head(~{::title})">
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body th:replace="layout/layout :: content(~{::content})">
+<content>
     <div class="container">
         <h3 style="font-weight: bold; margin-top: 30px">보관함</h3>
         <div class="button-group mt-2 mb-2 pt-2 pb-3" style="margin-bottom: 20px;">
@@ -197,7 +202,8 @@
 
         updateButtonStyles()
     </script>
-</div>
+</content>
+</body>
 </html>
 
 
