@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="layout/layout :: head(~{::title})">
-    <meta charset="UTF-8">
-    <title>home</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-</head>
-<body th:replace="layout/layout :: content(~{::content})">
-<content>
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<div layout:fragment="content" class="main">
     <div class="container">
         <div class="book-info">
             <div class="d-flex mt-3 mb-3 align-items-flex-end" style="position: relative;">
@@ -22,7 +17,10 @@
                     </div>
                     <div class="info-bottom" style="position: absolute; bottom: 0;">
                         <p style="color: #2b3035; font-size: 13px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-all;"  th:text="${bookInfo.bookIntro}"></p>
-                        <a href="#" style="min-width: 100px; max-width: 200px;" class="btn btn-outline-primary">첫회 보기</a>
+                        <a th:if="${#lists.size(bookInfo.chapterIdList) > 0}"
+                           th:href="@{|/chapter/read/${bookInfo.chapterIdList.get(0)}|}"
+                           style="min-width: 100px; max-width: 200px;"
+                           class="btn btn-outline-primary">첫회 보기</a>
                     </div>
                 </div>
                 <div class="info-right d-flex" style="height: 100%;">
@@ -80,12 +78,8 @@
         let sort = 'desc'
 
         $(".btn-more").on("click", function () {
-            if(loadPage>=totalPages) {
-                $(this).hide();
-            } else {
-                loadPage++; // 페이지 번호 증가
-                loadChapterList(bookId, loadPage);
-            }
+            loadPage++; // 페이지 번호 증가
+            loadChapterList(bookId, loadPage);
         });
 
         $("a[href*='order=ASC']").on("click", function (event) {
@@ -99,6 +93,8 @@
 
             $("a[href*='order=ASC']").css('color', 'blue');
             $("a[href*='order=DESC']").css('color', 'black');
+
+            $(".btn-more").show();
         });
 
         $("a[href*='order=DESC']").on("click", function (event) {
@@ -113,6 +109,8 @@
             // "최신화부터" 링크의 색상을 파란색으로 변경하고, "1화부터" 링크의 색상을 검은색으로 변경합니다.
             $("a[href*='order=DESC']").css('color', 'blue');
             $("a[href*='order=ASC']").css('color', 'black');
+
+            $(".btn-more").show();
         });
 
         function loadChapterList(bookId, loadPage) {
@@ -128,6 +126,11 @@
                     for (let chapter of response.content) {
                         chapterUl.append(chapterToHtml(chapter));
                     }
+
+                    if(response.last) {
+                        $(".btn-more").hide();
+                    }
+
                 },
                 error: function (){
                     alert('챕터 목록을 불러오는데 실패했습니다.');
@@ -258,6 +261,5 @@
 
         });
     </script>
-</content>
-</body>
+</div>
 </html>
