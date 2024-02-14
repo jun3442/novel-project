@@ -85,14 +85,29 @@ ul {
     text-decoration: underline;
 }
 
-a.btn-sort {
+a.btn-sort-asc {
     text-decoration: none;
     color: dimgrey;
     cursor: pointer;
     margin-top: 20px;
 }
 
-a.btn-sort.active {
+a.btn-sort-asc.active {
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: black;
+}
+
+a.btn-sort-desc {
+    text-decoration: none;
+    color: dimgrey;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+a.btn-sort-desc.active {
     text-decoration: none;
     font-size: 1.2em;
     font-weight: bold;
@@ -151,4 +166,16 @@ a.btn-sort.active {
     text-decoration: underline;
     text-decoration-color: black;
     font-weight: bold;
+}
+
+.coin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 200px;
+    margin-bottom: 10px;
+}
+
+.coin-item button {
+    width: 100px;
 }

@@ -10,14 +10,20 @@
                 <div class="d-flex flex-column mx-3" style="height: 100%;">
                     <div class="info-top">
                         <h3 class="mt-2" th:text="${bookInfo.bookName}"></h3>
-                        <div class="d-flex">
-                            <span class="px-2 border-end border-opacity-25" th:text="${bookInfo.bookGenre}"></span>
+                        <div class="d-flex" style="font-size: small; color: grey">
+                            <span class="pe-2 border-end border-opacity-25" th:text="${bookInfo.bookGenre.displayName}"></span>
                             <span class="px-2 mb-1" th:text="${bookInfo.writer}"></span>
                         </div>
                     </div>
                     <div class="info-bottom" style="position: absolute; bottom: 0;">
                         <p style="color: #2b3035; font-size: 13px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-all;"  th:text="${bookInfo.bookIntro}"></p>
-                        <a th:href="@{|/chapter/read/${bookInfo.chapterIdList.get(0)}|}" style="min-width: 100px; max-width: 200px;" class="btn btn-outline-primary">첫회 보기</a>
+                        <a th:if="${#lists.size(bookInfo.chapterIdList) > 0}"
+                           th:href="@{|/chapter/read/${bookInfo.chapterIdList.get(0)}|}"
+                           style="min-width: 100px; max-width: 200px;"
+                           class="btn btn-outline-primary">첫회 보기</a>
+                        <a th:href="@{|/coin/charge|}"
+                           style="min-width: 100px; max-width: 200px;"
+                           class="btn btn-outline-primary">코인 충전</a>
                     </div>
                 </div>
                 <div class="info-right d-flex" style="height: 100%;">
@@ -46,8 +52,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <p class="mt-2" style="font-size: x-large" th:text="'회차 ('+${bookInfo.chapterList.getTotalElements()}+')'"></p>
                 <div class="custom-order">
-                    <a class="p-3 " th:href="@{|/book/library/${bookInfo.id}?order=DESC|}">최신화부터</a>
-                    <a class="p-2" th:href="@{|/book/library/${bookInfo.id}?order=ASC|}">1화부터</a>
+                    <a class="p-3" th:href="@{/book/library/{id}(id=${bookInfo.id}, order='DESC')}">최신화부터</a>
+                    <a class="p-2" th:href="@{/book/library/{id}(id=${bookInfo.id}, order='ASC')}">1화부터</a>
                 </div>
             </div>
             <ul>
@@ -64,7 +70,7 @@
                 </th:block>
             </ul>
             <div>
-                <button class="btn btn-outline-primary mt-5 btn-more">더보기</button>
+                <button th:unless="${bookInfo.chapterList.totalPages == 0}" class="btn btn-outline-primary mt-5 btn-more">더보기</button>
             </div>
         </div>
     </div>
@@ -178,10 +184,7 @@
                 $("a[href*='order=DESC']").css('color', 'blue');
                 sort = 'desc';
             }
-        });
 
-
-        $(document).ready(function () {
             $('.likeIcon').click(function () {
                 const likeState = $(this).attr('like-state');
                 const likeCountElement = $(this).next(); // 좋아요 수를 표시하는 요소
@@ -255,7 +258,6 @@
                     });
                 }
             });
-
         });
     </script>
 </div>

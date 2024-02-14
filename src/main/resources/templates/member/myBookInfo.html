@@ -9,7 +9,7 @@
             <div class="d-flex flex-column mx-3" style="height: 100%;">
                 <h3 class="mt-2" th:text="${bookInfo.bookName}"></h3>
                 <div style="font-size: small; color: gray;">
-                    <span th:text="'구독 ' + ${bookInfo.subscribeCount}" style="margin-right: 10px;"></span>
+                    <span class="pe-2 border-end border-opacity-25" th:text="'구독 ' + ${bookInfo.subscribeCount}"></span>
                     <span th:text="'조회 ' + ${bookInfo.totalHits}"></span>
                 </div>
                 <div class="info-bottom" style="position: absolute; bottom: 0;">
@@ -44,7 +44,7 @@
                 </th:block>
             </ul>
             <div>
-                <button class="btn btn-outline-primary mt-5 btn-more">더보기</button>
+                <button th:unless="${bookInfo.chapterList.totalPages == 0}" class="btn btn-outline-primary mt-5 btn-more">더보기</button>
             </div>
         </div>
     </div>
