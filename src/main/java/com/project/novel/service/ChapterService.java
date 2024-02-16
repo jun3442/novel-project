@@ -51,9 +51,14 @@ public class ChapterService {
         String bookKey = "book:chapters:" + bookId;
         List<Object> chapterIdList = (List<Object>) ops.get(bookKey);
         if (chapterIdList == null) {
-            chapterIdList = new ArrayList<>();
+            chapterIdList = chapterRepository.findAllByBookId(bookId)
+                    .stream()
+                    .map(Chapter::getId)
+                    .collect(Collectors.toList());
+            chapterIdList.add(chapter.getId()); // 새로운 챕터의 ID를 추가
+        } else {
+            chapterIdList.add(chapter.getId()); // 새로운 챕터의 ID를 추가
         }
-        chapterIdList.add(chapter.getId());
 
         // 업데이트된 챕터 리스트를 Redis에 저장
         ops.set(bookKey, chapterIdList, 1, TimeUnit.MINUTES);

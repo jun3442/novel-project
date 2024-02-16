@@ -10,15 +10,17 @@
 <content>
     <div class="container justify-content-center d-flex" >
         <div class="col-8">
-            <h1>회차 쓰기</h1>
+            <h1>회차 수정</h1>
             <form method="post" th:action="@{|/chapter/modify/${chapterId}|}" th:object="${chapterUploadDto}">
                 <div class="mb-3">
                     <label for="title" class="form-label"></label>
                     <input type="text" class="form-control" id="title" name="title" th:field="*{title}" placeholder="제목을 입력하세요">
+                    <p class="error" th:if="${errors?.containsKey('title')}" th:text="${errors['title']}">Title Error</p>
                 </div>
                 <div class="mb-3">
                     <label for="contents" class="form-label"></label>
                     <textarea class="form-control" id="contents" name="contents" rows="10" th:field="*{contents}" placeholder="내용을 입력하세요"></textarea>
+                    <p class="error" th:if="${errors?.containsKey('contents')}" th:text="${errors['contents']}">Contents Error</p>
                 </div>
                 <div class="mb-3">
                     <label for="price" class="form-label">가격 설정</label>
@@ -26,6 +28,7 @@
                         <option value="0">무료</option>
                         <option value="1">유료</option>
                     </select>
+                    <p class="error" th:if="${errors?.containsKey('price')}" th:text="${errors['price']}">Price Error</p>
                 </div>
                 <input type="hidden" id="bookId" name="bookId" th:value="${chapterUploadDto.bookId}">
                 <div class="mt-5 d-grid">
@@ -79,6 +82,7 @@
             // 모든 유효성 검사를 통과하면 폼 제출
         });
     </script>
+</div>
 </content>
 </body>
 </html>

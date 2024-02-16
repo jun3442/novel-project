@@ -11,13 +11,13 @@
     <div class="container justify-content-center d-flex">
         <!-- 소설(텍스트) 작성 -->
         <div class="col-8">
-            <h2>새 작품 쓰기</h2>
+            <h2>작품 수정</h2>
             <form method="post" th:action="@{|/book/modify/${bookId}|}" enctype="multipart/form-data" th:object="${bookUploadDto}">
                 <div class="mb-3">
                     <div class="mb-3">
                         <label for="title" class="form-label">제목</label>
                         <input class="form-control" type="text" id="title" name="bookName" placeholder="제목" th:field="*{bookName}" th:maxlength="30">
-                        <div class="form-text text-danger" th:if="${#fields.hasErrors('bookName')}" th:errors="*{bookName}"></div>
+                        <p class="error" th:if="${errors?.containsKey('bookName')}" th:text="${errors['bookName']}">Title Error</p>
                     </div>
 
                     <div class="mb-3">
@@ -26,26 +26,27 @@
                             <option value="">장르선택</option>
                             <option th:each="genre : ${T(com.project.novel.enums.BookGenre).values()}" th:value="${genre}" th:text="${genre}"></option>
                         </select>
-                        <div class="form-text text-danger" th:if="${#fields.hasErrors('bookGenre')}" th:errors="*{bookGenre}"></div>
+                        <p class="error" th:if="${errors?.containsKey('bookGenre')}" th:text="${errors['bookGenre']}">Genre Error</p>
                     </div>
 
                     <div class="mb-3">
                         <label for="file" class="form-label">표지 이미지</label>
                         <input class="form-control" type="file" id="file" name="bookImage" th:field="*{bookImage}" onchange="validateImage()">
+                        <p class="error" th:if="${errors?.containsKey('bookImage')}" th:text="${errors['bookImage']}">Image Error</p>
                     </div>
 
                     <div class="mb-3">
                         <label for="content" class="form-label">작품 소개</label>
-                        <textarea class="form-control" id="content" name="bookIntro" rows="10" th:field="*{bookIntro}" th:maxlength="800"></textarea>
-                        <div class="form-text text-danger" th:if="${#fields.hasErrors('bookIntro')}" th:errors="*{bookIntro}"></div>
+                        <textarea class="form-control" id="content" name="bookIntro" rows="10" th:field="*{bookIntro}"></textarea>
+                        <p class="error" th:if="${errors?.containsKey('bookIntro')}" th:text="${errors['bookIntro']}">Intro Error</p>
                     </div>
 
                     <div class="mb-3">
                         <label for="ageRating" class="form-label">작품 나이 제한 설정</label>
                         <select class="form-select" id="ageRating" name="ageRating" th:field="*{ageRating}">
-                            <option th:each="ageRating : ${ageRating}" th:text="${ageRating.ratingName}" th:value="${ageRating.toString()}">나이 제한 설정</option>
+                            <option th:each="ageRating : ${ageRating}" th:value="${ageRating.toString()}" th:text="${ageRating.ratingName}">나이 제한 설정</option>
                         </select>
-                        <div class="form-text text-danger" th:if="${#fields.hasErrors('ageRating')}" th:errors="*{ageRating}"></div>
+                        <p class="error" th:if="${errors?.containsKey('ageRating')}" th:text="${errors['ageRating']}">Age Rating Error</p>
                     </div>
 
                 </div>
@@ -62,6 +63,10 @@
         </div>
     </div>
     <script>
+
+        let isFormSubmitted = false;
+
+
         $(document).ready(function() {
             let bookId = $('#bookId').val(); // 숨겨진 입력 필드에서 bookId 값을 읽습니다.
             console.log(bookId);
@@ -79,12 +84,27 @@
                 }
             });
         });
+
         function validateImage() {
-            let fileName = document.getElementById("file").value;
+            let fileInput = document.getElementById("file");
+            let file = fileInput.files[0];
+
+            // 파일 크기 검사 (2MB 제한)
+            let maxSize = 2 * 1024 * 1024; // 2MB
+            if (file.size > maxSize) {
+                alert("파일 크기는 2MB를 초과할 수 없습니다.");
+                fileInput.value = ""; // 파일 선택을 취소
+                return;
+            }
+
+            // 파일 확장자 검사
+            let fileName = fileInput.value;
             let idxDot = fileName.lastIndexOf(".") + 1;
-            let extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
-            (extFile==="jpg" || extFile==="jpeg" || extFile==="png") ? true : alert("확장자 jpg, jpeg, png만 가능합니다.");
-            (extFile==="jpg" || extFile==="jpeg" || extFile==="png") ? true : document.getElementById("file").value = ""; // 파일 선택을 취소
+            let extFile = fileName.slice(idxDot).toLowerCase();
+            if (extFile !== "jpg" && extFile !== "jpeg" && extFile !== "png") {
+                alert("확장자 jpg, jpeg, png만 가능합니다.");
+                fileInput.value = ""; // 파일 선택을 취소
+            }
         }
 
         function confirmDelete() {
@@ -97,18 +117,50 @@
         }
 
         function confirmModify() {
-            let confirmDelete = confirm("선택하신 작품을 수정하시겠습니까?");
-            if (!confirmDelete) {
+            let fileInput = document.getElementById("file");
+            let confirmMessage = "선택하신 작품을 수정하시겠습니까?";
+
+            // 이미지가 선택되지 않았을 경우, 메시지 추가
+            if (!fileInput.value) {
+                confirmMessage += "\n이미지를 선택하지 않았습니다. 장르 별 기본 이미지로 설정됩니다.";
+            }
+
+            let confirmModify = confirm(confirmMessage);
+            if (!confirmModify) {
                 // 사용자가 취소를 클릭한 경우, 링크의 기본 동작을 취소
                 return false;
             }
         }
 
 
+        document.querySelector('form').addEventListener('submit', function(event) {
+            isFormSubmitted = true;
+        });
+
+        window.addEventListener('beforeunload', function (event) {
+            // 폼 제출 시에는 beforeunload 이벤트를 방지
+            if (isFormSubmitted) {
+                return;
+            }
+
+            // 폼에 입력된 값이 있는지 확인
+            const bookName = document.getElementById('title').value;
+            const bookGenre = document.getElementById('genre').value;
+            const bookImage = document.getElementById('file').value;
+            const bookIntro = document.getElementById('content').value;
+            const ageRating = document.getElementById('ageRating').value;
+
+            if (bookName || bookGenre || bookImage || bookIntro || ageRating) {
+                // 경고 메시지 설정
+                event.preventDefault();
+                event.returnValue = '저장하지 않은 변경사항이 있습니다. 페이지를 떠나시겠습니까?';
+            }
+        });
 
 
 
     </script>
+</div>
 </content>
 </body>
 </html>

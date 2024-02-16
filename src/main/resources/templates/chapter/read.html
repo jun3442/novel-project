@@ -19,7 +19,7 @@
     <div class="container">
         <div class="d-flex justify-content-center">
             <div class="col-8">
-                <h1><a class="custom-link" id="chapter-title" th:href="@{|/book/library/${chapterDetailDto.bookId}?order=DESC|}" th:text="${chapterDetailDto.title}"></a></h1>
+                <h1><a class="custom-link" id="chapter-title" th:href="@{/book/library/{bookId}(bookId=${chapterDetailDto.bookId}, order='DESC')}" th:text="${chapterDetailDto.title}"></a></h1>
                 <div class="d-flex justify-content-between">
                     <div class="d-flex">
                         <div>
@@ -32,14 +32,14 @@
                         <span id="chapter-hits" th:text="${chapterDetailDto.hits}"></span>
                     </div>
                 </div>
-                <div class="mt-5" id="chapter-contents" th:text="${chapterDetailDto.contents}"></div>
+                <div class="mt-5" id="chapter-contents" style="color: #2b3035; font-size: 18px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-all;" th:text="${chapterDetailDto.contents}"></div>
             </div>
         </div>
         <div class="border-bottom border-opacity-25 mt-5 mb-5"></div>
         <a class="btn-sort-desc active">
             최신순
         </a>
-        <a class="btn-sort">
+        <a class="btn-sort-asc">
             전체 댓글
         </a>
         <div class="review-list mt-5">
@@ -62,6 +62,7 @@
         const CHAPTER_NAVBAR = '#chapterNavbar';
         const REVIEW_LIST = '#review';
         const COMMENT_TEXT = '#commentText';
+        const $sortButtons = $('.btn-sort-asc, .btn-sort-desc');
 
         let chapterId = [[${chapterDetailDto.chapterId}]];
         let loadPage = 0;
@@ -129,21 +130,23 @@
             })
         });
 
-        $('.btn-sort, .btn-sort-desc').click(function () {
+        $sortButtons.click(function () {
             // 모든 버튼에서 'active' 클래스 제거
-            $('.btn-sort, .btn-sort-desc').removeClass('active');
+            $sortButtons.removeClass('active');
 
             // 클릭된 버튼에 'active' 클래스 추가
             $(this).addClass('active');
 
             // 클릭된 버튼에 따라 정렬 방식 설정
-            sort = $(this).hasClass('btn-sort') ? 'asc' : 'desc';
+            sort = $(this).hasClass('btn-sort-asc') ? 'asc' : 'desc';
 
             // 페이지 번호 초기화 및 댓글 목록 업데이트
             loadPage = 0;
             let reviewUl = $(REVIEW_LIST);
             reviewUl.empty();
             loadReviewList(chapterId, loadPage);
+
+            $('.btn-more').show();
         });
 
         $(".btn-more").on("click", function () {
@@ -238,7 +241,7 @@
             chapterId = response.chapterId;
             chapterDetailDto = response;
 
-            $('.btn-sort, .btn-sort-desc').removeClass('active');
+            $('.btn-sort-asc, .btn-sort-desc').removeClass('active');
             $('.btn-sort-desc').addClass('active');
             sort = 'desc';
 
@@ -277,7 +280,7 @@
 
         $(document).click(function(event) {
             // 클릭한 요소가 네비게이션바, 아닐 경우
-            if (!$(event.target).closest('.navbar, .btn-comment, #commentText, .btn-sort, .btn-sort-desc').length) {
+            if (!$(event.target).closest('.navbar, .btn-comment, #commentText, .btn-sort-asc, .btn-sort-desc').length) {
                 if (navbarVisible) {
                     // 네비게이션바 숨기기
                     $(CHAPTER_NAVBAR).hide();
@@ -290,7 +293,7 @@
             }
         });
     </script>
-
+</div>
 </content>
 </body>
 </html>

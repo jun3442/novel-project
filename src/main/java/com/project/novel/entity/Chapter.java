@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Chapter extends BaseEntity {
+public class Chapter {
 
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "chapter_id")
@@ -32,6 +32,7 @@ public class Chapter extends BaseEntity {
 
     @Lob
     @NotBlank(message = "내용을 입력해주세요.")
+    @Size(min = 1, max = 20000, message = "1자 이상 20000자 이하 입력 가능합니다.")
     private String contents;
 
     @NotNull(message = "가격을 입력해주세요.")

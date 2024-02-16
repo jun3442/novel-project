@@ -14,6 +14,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.validation.FieldError;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/chapter")
@@ -26,9 +30,12 @@ public class ChapterController {
 
     @GetMapping("/write/{bookId}")
     public String writeChapter(@PathVariable(name="bookId") Long bookId,
+                               @ModelAttribute("chapterUploadDto") ChapterUploadDto chapterUploadDto,
                                Model model) {
         model.addAttribute("bookId", bookId);
-        model.addAttribute("chapterUploadDto", new ChapterUploadDto());
+        if(chapterUploadDto == null) {
+            model.addAttribute("chapterUploadDto", new ChapterUploadDto());
+        }
         return "chapter/write";
     }
 
@@ -38,7 +45,12 @@ public class ChapterController {
                                @PathVariable(name="bookId") Long bookId,
                                RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errors", bindingResult.getFieldErrors());
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            redirectAttributes.addFlashAttribute("chapterUploadDto", chapterUploadDto);
+            log.info("errors: {}", errors);
+            log.info("chapterUploadDto: {}", chapterUploadDto.toString());
             return "redirect:/chapter/write/" + bookId;
         }
         chapterService.writeChapter(chapterUploadDto, bookId);
@@ -79,7 +91,10 @@ public class ChapterController {
                                 @PathVariable(name="chapterId") Long chapterId,
                                 RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errors", bindingResult.getFieldErrors());
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (message1, message2) -> message1 + ", " + message2));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            redirectAttributes.addFlashAttribute("chapterUploadDto", chapterUploadDto);
             return "redirect:/chapter/modify/" + chapterId;
         }
         chapterService.modifyChapter(chapterUploadDto, chapterId);

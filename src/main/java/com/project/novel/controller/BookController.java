@@ -7,6 +7,7 @@ import com.project.novel.enums.AgeRating;
 import com.project.novel.enums.BookGenre;
 import com.project.novel.service.BookService;
 import jakarta.validation.Valid;
+import org.springframework.validation.FieldError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/book")
@@ -65,7 +70,8 @@ public class BookController {
     }
 
     @GetMapping("/modify/{bookId}")
-    public String modifyBook(@PathVariable(name="bookId") Long bookId, Model model) {
+    public String modifyBook(@PathVariable(name="bookId") Long bookId,
+                             Model model) {
         BookUploadDto bookUploadDto = bookService.getModifiedBook(bookId);
         model.addAttribute("bookUploadDto", bookUploadDto);
         model.addAttribute("bookId", bookId);
@@ -78,10 +84,13 @@ public class BookController {
     public String modifyProcess(@Valid @ModelAttribute BookUploadDto bookUploadDto,
                                 BindingResult bindingResult,
                                 @PathVariable(name="bookId") Long bookId,
-                                Model model) {
+                                RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
-            model.addAttribute("bookUploadDto", bookUploadDto);
-            return "redirect:/book/modify" + bookId;
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (message1, message2) -> message1 + ", " + message2));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            redirectAttributes.addFlashAttribute("bookUploadDto", bookUploadDto);
+            return "redirect:/book/modify/" + bookId;
         }
         bookService.updateBook(bookUploadDto, bookId);
         return "redirect:/member/myBookList";

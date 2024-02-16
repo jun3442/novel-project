@@ -21,7 +21,6 @@
       </ul>
 
       <div class="text-end">
-        <span sec:authentication="name"></span>
         <th:block sec:authorize="hasRole(T(com.project.novel.constant.Grade).ADMIN)">
           <div class="gnb_li">
             <ul class="nav nav-pills">
@@ -85,6 +84,13 @@
                   <span class="gnb_bg"></span>
                   <span class="gnb-bdr"></span>
                   <span class="gnb_txt">자유게시판</span>
+                </a>
+              </li>
+              <li class="mx-3">
+                <a th:href="@{/member/myBookList}" class="gnb_logout">
+                  <span class="gnb_bg"></span>
+                  <span class="gnb-bdr"></span>
+                  <span class="gnb_txt">내정보</span>
                 </a>
               </li>
               <li class="mx-3">
